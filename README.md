@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by <your_login>.*
+*This project has been created as part of the 42 curriculum by guantino.*
 
 # Fly-in
 
@@ -39,15 +39,9 @@ Requirements: **Python 3.10 or later** (the code uses `X | None` type syntax).
 
 ```bash
 make install       # create a .venv and install flake8 + mypy
-<<<<<<< HEAD
 make run           # run on the default map (maps/01_linear_path.txt)
 make run MAP=maps/02_simple_fork.txt      # run on another map
 make visual MAP=maps/02_simple_fork.txt   # coloured turn-by-turn view
-=======
-make run           # run on the default map (maps/example.txt)
-make run MAP=maps/easy_fork.txt      # run on another map
-make visual MAP=maps/easy_fork.txt   # coloured turn-by-turn view
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
 make debug         # run under pdb
 make lint          # flake8 . and mypy . (with the subject's flags)
 make lint-strict   # flake8 . and mypy . --strict
@@ -58,7 +52,6 @@ make fclean        # also remove the virtualenv
 You can also run it directly without the Makefile:
 
 ```bash
-<<<<<<< HEAD
 python3 fly_in.py maps/01_linear_path.txt
 python3 fly_in.py --visual maps/01_linear_path.txt
 ```
@@ -124,75 +117,6 @@ checker replays the emitted lines from scratch and asserts every rule
 It shares no logic with the simulator on purpose: if the two ever disagree, one
 has a bug. The program refuses to print a trace that fails this check.
 
-=======
-python3 fly_in.py maps/example.txt
-python3 fly_in.py --visual maps/example.txt
-```
-
-On success the program prints one line per turn to stdout and a short summary
-(`Delivered N drones in T turns.`) to stderr. On any error it prints a clear
-message (with a line number for parse errors) and exits with a non-zero code.
-
-## Map file format
-
-```
-nb_drones: 5
-
-start_hub: hub 0 0 [color=green]
-end_hub: goal 10 10 [color=yellow]
-hub: roof1 3 4 [zone=restricted color=red]
-hub: corridorA 4 3 [zone=priority color=green max_drones=2]
-connection: hub-roof1
-connection: corridorA-tunnelB [max_link_capacity=2]
-```
-
-- First line: `nb_drones: <positive integer>`.
-- `start_hub:` / `end_hub:` / `hub:` define zones as `<name> <x> <y> [metadata]`.
-- Zone names may not contain dashes or spaces.
-- Metadata is optional, in any order: `zone=<type>`, `color=<word>`,
-  `max_drones=<n>` (ignored on start/end).
-- `connection: <name1>-<name2> [max_link_capacity=<n>]` links two existing zones.
-- Lines starting with `#` are comments.
-
-## Algorithm choices and implementation strategy
-
-**Data model (object-oriented).** `Zone`, `Connection` and `Network` hold the
-graph and enforce their own invariants by raising `ValueError`. The `Parser`
-only reads text and tracks line numbers; it catches those `ValueError`s and
-re-raises them as `ParserError` with the offending line, so the rules live in
-one place and are not duplicated. `HubZone` (start/end/regular) and `ZoneType`
-(normal/blocked/restricted/priority) are enums.
-
-**Pathfinding (`Pathfinder`).** Because entering a restricted zone costs 2 turns,
-edges are weighted, so a **Dijkstra** search is used rather than plain BFS. The
-cost of a path is a tuple `(turns, non_priority_zones)`, compared turns-first, so
-among equally fast routes the one through more priority zones wins. To route many
-drones in parallel, `find_paths()` repeatedly takes the cheapest remaining route
-and **consumes one unit of capacity** from each interior zone and connection it
-uses; a route stops being available once a resource on it is exhausted. Since a
-route carries drones single-file (one unit of each resource), the returned routes
-are collectively safe to simulate at once.
-
-**Drone assignment (`assign_paths` in `fly_in.py`).** Drones are handed out one
-at a time to the route whose **projected finish time** — its single-drone
-traversal cost plus the drones already queued on it — is currently smallest. This
-length-aware balancing beats naive round-robin: a long detour is only used once
-the short routes are saturated, which lowers the total turn count.
-
-**Simulation (`Simulator`).** Each turn, active drones are advanced closest-to-end
-first, so a zone freed by a leading drone can be reused by its follower in the
-same turn. A drone entering a restricted zone spends one turn on the connection
-(printed as `D<id>-<src>-<dst>`) and **must** land the next turn; it reserves its
-destination up front so the landing is always legal. Zone and connection
-capacities are checked against a live per-turn snapshot before every move.
-
-**Self-checking (`SimulationChecker`).** After the simulation, an independent
-checker replays the emitted lines from scratch and asserts every rule
-(adjacency, capacities, restricted transits, all drones ending at the end zone).
-It shares no logic with the simulator on purpose: if the two ever disagree, one
-has a bug. The program refuses to print a trace that fails this check.
-
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
 **Complexity.** One Dijkstra search is `O(E log V)`; `find_paths` runs at most a
 bounded number of searches, and the simulation is `O(turns × drones)`. No path is
 recomputed during simulation — routes are found once and cached in the drones.
@@ -209,7 +133,6 @@ that works purely from the output lines.
 
 ## Example
 
-<<<<<<< HEAD
 Input (`maps/02_simple_fork.txt`), 4 drones over two routes:
 
 ```
@@ -224,38 +147,14 @@ connection: junction-path_a
 connection: junction-path_b
 connection: path_a-goal
 connection: path_b-goal
-=======
-Input (`maps/easy_fork.txt`), 4 drones over two disjoint routes:
-
-```
-nb_drones: 4
-start_hub: start 0 0
-end_hub: goal 6 0
-hub: a1 1 1
-hub: a2 2 1
-hub: b1 1 -1
-hub: b2 2 -1
-connection: start-a1
-connection: a1-a2
-connection: a2-goal
-connection: start-b1
-connection: b1-b2
-connection: b2-goal
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
 ```
 
 Output:
 
 ```
-<<<<<<< HEAD
 D1-junction D2-junction
 D1-path_a D2-path_b D3-junction D4-junction
 D1-goal D2-goal D3-path_a D4-path_b
-=======
-D1-a1 D2-b1
-D1-a2 D2-b2 D3-a1 D4-b1
-D1-goal D2-goal D3-a2 D4-b2
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
 D3-goal D4-goal
 ```
 
@@ -270,16 +169,6 @@ All four drones are delivered in 4 turns.
 
 ### Use of AI
 
-<<<<<<< HEAD
 AI was used as a support tool for: brainstorming the module breakdown, reviewing
 the code for edge cases, explaining the restricted-zone transit rule, and
 drafting documentation.
-=======
-> Adapt this section to your own process and make sure you can explain every line
-> of the code during the peer review, as the subject requires.
-
-AI was used as a support tool for: brainstorming the module breakdown, reviewing
-the code for edge cases, explaining the restricted-zone transit rule, and
-drafting documentation. All algorithmic decisions were reviewed and validated by
-hand, and every rule was cross-checked with the independent `SimulationChecker`.
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
