@@ -2,11 +2,7 @@ VENV        = .venv
 PYTHON      = $(VENV)/bin/python
 PIP         = $(VENV)/bin/pip
 MAIN        = fly_in.py
-<<<<<<< HEAD
 MAP         = maps/01_linear_path.txt
-=======
-MAP         = maps/example.txt
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
 
 MYPY_FLAGS  = --warn-return-any \
               --warn-unused-ignores \
