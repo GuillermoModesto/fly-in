@@ -17,42 +17,11 @@ def load_network(path: str) -> Network:
 	return Parser().parse(text)
 
 
-<<<<<<< HEAD
 def assign_paths(
 	network: Network, paths: list[list[Zone]]
 ) -> list[list[Zone]]:
 	"""Assign one path to each drone by round-robin across the found paths."""
 	return [paths[i % len(paths)] for i in range(network.nb_drones)]
-=======
-def _path_turn_cost(path: list[Zone]) -> int:
-	"""Turns a single drone needs to traverse `path` (sum of entry costs)."""
-	return sum(zone.zone_type.movement_cost() for zone in path[1:])
-
-
-def assign_paths(
-	network: Network, paths: list[list[Zone]]
-) -> list[list[Zone]]:
-	"""Assign one path to each drone, balancing the load by path length.
-
-	Drones are handed out one at a time to the path whose projected finish
-	time -- its single-drone traversal cost plus the drones already queued on
-	it -- is currently smallest. This beats naive round-robin when paths differ
-	in length: a longer detour is only used once the short routes are saturated,
-	which lowers the total turn count.
-	"""
-	if not paths:
-		return []
-	costs = [_path_turn_cost(path) for path in paths]
-	queued = [0] * len(paths)
-	assignment: list[list[Zone]] = []
-	for _ in range(network.nb_drones):
-		best = min(
-			range(len(paths)), key=lambda i: costs[i] + queued[i]
-		)
-		queued[best] += 1
-		assignment.append(paths[best])
-	return assignment
->>>>>>> 45a99c5edc2fa3228068c074d2348e2b7d589709
 
 
 def run_simulation(network: Network) -> list[str]:
